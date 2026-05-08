@@ -14,7 +14,7 @@ const CONFIG = {
   // Paso 2: Abrila y copiá el ID de la URL:
   //   drive.google.com/drive/folders/ESTE-ES-EL-ID
   // Paso 3: Pegalo aquí abajo entre las comillas
-  DRIVE_FOLDER_ID:   'PEGAR_ID_DE_CARPETA_AQUI',
+  DRIVE_FOLDER_ID:   '1UtO-Q6_QAnP6D9IrknPYXUqhnWap3cRP',
 
   COL_FOTOS_START:   12,    // columnas L a Q (6 fotos)
   COL_OBSERV:        18,    // columna R
