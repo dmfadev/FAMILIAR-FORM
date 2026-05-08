@@ -1,192 +1,581 @@
-// ============================================================
-//  SISTEMA DE FISCALIZACIÓN — BANCO FAMILIAR
-//  Código.gs · Versión GitHub Pages (API Mode)
-// ============================================================
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Fiscalización · Banco Familiar</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --azul:#003087;--azul-d:#00205e;
+  --rojo:#C8102E;--verde:#1e7e34;--gris-1:#f8f9fa;
+  --gris-2:#e8eaed;--gris-3:#9aa0a6;--txt:#202124;
+  --radius:12px;--shadow:0 2px 12px rgba(0,0,0,.1);
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f3f4;color:var(--txt);min-height:100vh}
 
-const CONFIG = {
-  SPREADSHEET_ID:   '1TNAQtvRbgLZ0NfwEYGLJTC-x-MQgy0CaDQgLNrhPhPs',
-  SHEET_SUCURSALES: 'SUCURSALES',
-  SHEET_MODELO:     'MODELO',
-  SHEET_RESPUESTAS: 'RESPUESTAS',
-  DRIVE_FOLDER_ID:  '1UtO-Q6_QAnP6D9IrknPYXUqhnWap3cRP',
-  MAX_FOTOS: 6,
-  MIN_FOTOS: 1,
+.header{background:var(--azul);padding:14px 20px;display:flex;align-items:center;gap:14px;
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.header img{width:48px;height:48px;object-fit:contain;border-radius:8px;background:#fff;padding:2px}
+.header h1{color:#fff;font-size:1.1rem;font-weight:700;line-height:1.2}
+.header p{color:rgba(255,255,255,.75);font-size:.75rem;margin-top:2px}
+
+.container{max-width:660px;margin:20px auto;padding:0 14px 60px}
+
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+.card-title{font-size:.7rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--azul);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:var(--gris-2)}
+
+.field{margin-bottom:13px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:.8rem;font-weight:600;color:#5f6368;margin-bottom:5px}
+.req{color:var(--rojo);margin-left:2px}
+
+.fecha-display{width:100%;padding:10px 14px;border:1.5px solid var(--gris-2);border-radius:8px;
+  font-size:.88rem;background:var(--gris-1);color:#5f6368;font-weight:600;
+  display:flex;align-items:center;gap:8px}
+.fecha-display span{color:var(--azul)}
+.fecha-display small{margin-left:auto;font-size:.7rem;color:var(--gris-3)}
+
+select{width:100%;padding:10px 14px;border:1.5px solid var(--gris-2);border-radius:8px;
+  font-size:.94rem;color:var(--txt);background:var(--gris-1);
+  -webkit-appearance:none;appearance:none;font-family:inherit;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:36px;cursor:pointer;
+  transition:border-color .18s,box-shadow .18s}
+select:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,48,135,.14);background-color:#fff}
+
+.search-wrap{position:relative}
+.search-input{width:100%;padding:10px 14px;border:1.5px solid var(--gris-2);
+  border-radius:8px;font-size:.94rem;background:var(--gris-1);font-family:inherit;
+  color:var(--txt);transition:border-color .18s,box-shadow .18s;-webkit-appearance:none}
+.search-input:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,48,135,.14);background-color:#fff}
+.dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;
+  background:#fff;border:1.5px solid var(--azul);border-radius:8px;
+  max-height:220px;overflow-y:auto;box-shadow:0 4px 18px rgba(0,0,0,.13);z-index:50}
+.dropdown.open{display:block}
+.dropdown-item{padding:10px 14px;cursor:pointer;font-size:.91rem;
+  border-bottom:1px solid var(--gris-2);transition:background .15s}
+.dropdown-item:last-child{border-bottom:none}
+.dropdown-item:hover{background:#e8f0fe;color:var(--azul)}
+.dropdown-item strong{color:var(--azul)}
+.local-badge{display:none;margin-top:8px;padding:9px 14px;background:#e8f0fe;
+  border-radius:8px;font-size:.88rem;font-weight:600;color:var(--azul-d);align-items:center;gap:8px}
+.local-badge.show{display:flex}
+.local-badge .clear{margin-left:auto;cursor:pointer;font-size:.78rem;
+  color:var(--gris-3);border:none;background:none;padding:0}
+.local-badge .clear:hover{color:var(--rojo)}
+
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+.btn-radio{flex:1;min-width:80px;padding:10px 8px;border:2px solid var(--gris-2);
+  border-radius:8px;background:var(--gris-1);font-size:.86rem;font-weight:600;
+  cursor:pointer;text-align:center;transition:all .15s;color:#5f6368;user-select:none}
+.btn-radio.yes{border-color:var(--verde);background:#e6f4ea;color:var(--verde)}
+.btn-radio.no{border-color:var(--rojo);background:#fce8e6;color:var(--rojo)}
+.btn-radio.sel{border-color:var(--azul);background:#e8f0fe;color:var(--azul)}
+
+.chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px}
+.chk-label{display:flex;align-items:center;gap:8px;padding:8px 11px;
+  border:1.5px solid var(--gris-2);border-radius:8px;cursor:pointer;
+  font-size:.86rem;background:var(--gris-1);transition:all .15s;line-height:1.3}
+.chk-label input[type=checkbox]{width:17px;height:17px;accent-color:var(--azul);flex-shrink:0}
+.chk-label:has(input:checked){border-color:var(--azul);background:#e8f0fe;color:var(--azul);font-weight:600}
+
+.cond{display:none}.cond.on{display:block}
+
+.foto-zona{border:2px dashed var(--gris-3);border-radius:var(--radius);padding:22px 16px;
+  text-align:center;cursor:pointer;position:relative;transition:all .15s;background:var(--gris-1)}
+.foto-zona:hover,.foto-zona.drag{border-color:var(--azul);background:#f0f4ff}
+.foto-zona input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.foto-zona p{font-size:.84rem;color:var(--gris-3);line-height:1.6;padding:8px 0}
+.progress-bar{height:4px;background:var(--gris-2);border-radius:4px;margin-top:10px;overflow:hidden}
+.progress-fill{height:100%;background:var(--azul);width:0%;transition:width .3s}
+.foto-counter{margin-top:8px;font-size:.82rem;font-weight:600;text-align:center}
+.foto-counter.warn{color:#856404}.foto-counter.ok{color:var(--verde)}
+.fotos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;
+  border:2px solid var(--gris-2);background:var(--gris-1)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .num{position:absolute;bottom:4px;left:5px;background:rgba(0,0,0,.55);
+  color:#fff;font-size:.68rem;font-weight:700;padding:1px 5px;border-radius:4px}
+.thumb .del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.55);
+  color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;
+  cursor:pointer;line-height:22px;text-align:center;transition:background .15s}
+.thumb .del:hover{background:var(--rojo)}
+
+textarea{width:100%;padding:10px 14px;border:1.5px solid var(--gris-2);border-radius:8px;
+  font-size:.94rem;color:var(--txt);background:var(--gris-1);resize:vertical;
+  min-height:88px;font-family:inherit;transition:border-color .18s,box-shadow .18s}
+textarea:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,48,135,.14);background:#fff}
+
+.btn-enviar{width:100%;padding:15px;background:var(--azul);color:#fff;
+  border:none;border-radius:var(--radius);font-size:1rem;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .18s;letter-spacing:.02em}
+.btn-enviar:hover:not(:disabled){background:var(--azul-d);transform:translateY(-1px);
+  box-shadow:0 4px 18px rgba(0,48,135,.35)}
+.btn-enviar:disabled{background:var(--gris-3);cursor:not-allowed;transform:none;box-shadow:none}
+.spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.35);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.overlay{position:fixed;inset:0;background:rgba(255,255,255,.92);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;z-index:999;font-weight:600;color:var(--azul);font-size:.95rem}
+.overlay.on{display:flex}
+.big-spin{width:50px;height:50px;border:4px solid var(--gris-2);
+  border-top-color:var(--azul);border-radius:50%;animation:spin .8s linear infinite}
+.overlay-sub{font-size:.82rem;color:var(--gris-3);font-weight:400}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  padding:13px 22px;border-radius:10px;color:#fff;font-weight:600;font-size:.93rem;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);transition:transform .32s cubic-bezier(.34,1.56,.64,1);
+  z-index:9999;min-width:260px;text-align:center;pointer-events:none}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--verde)}.toast.err{background:var(--rojo)}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="big-spin"></div>
+  <div id="overlay-msg">Cargando...</div>
+  <div class="overlay-sub" id="overlay-sub"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="header">
+  <img src="logo_banco_familiar.png" alt="Banco Familiar">
+  <div>
+    <h1>Sistema de Fiscalizacion</h1>
+    <p>Banco Familiar · Relevamiento de locales</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <div class="card-title">Identificacion</div>
+
+    <div class="field">
+      <label>Fiscalizador <span class="req">*</span></label>
+      <select id="sel-fiscalizador">
+        <option value="" disabled selected>Cargando...</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Fecha de la encuesta</label>
+      <div class="fecha-display">
+        <span id="fecha-hoy"></span>
+        <small>Generada automaticamente</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Local</div>
+    <div class="field" id="campo-local">
+      <label>Buscar local <span class="req">*</span></label>
+      <div class="search-wrap">
+        <input type="text" id="buscar-local" class="search-input"
+          placeholder="Escribi el nombre del local..." autocomplete="off" spellcheck="false">
+        <div class="dropdown" id="dropdown-locales"></div>
+      </div>
+      <div class="local-badge" id="local-badge">
+        <span id="badge-txt"></span>
+        <button class="clear" id="clear-local">cambiar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Materiales</div>
+
+    <div class="field">
+      <label>El local cuenta con los materiales designados <span class="req">*</span></label>
+      <div class="btn-group">
+        <div class="btn-radio" data-mat="SI">Si</div>
+        <div class="btn-radio" data-mat="NO">No</div>
+      </div>
+    </div>
+
+    <div class="cond" id="sec-mat">
+
+      <div class="field">
+        <label>Cual es el beneficio que ofrece este aliado</label>
+        <select id="sel-beneficio">
+          <option value="" disabled selected>— Seleccionar —</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Que tipo de oferta corresponde a este local</label>
+        <select id="sel-tipo-oferta">
+          <option value="" disabled selected>— Seleccionar —</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Que tipo de material tiene este aliado asignado</label>
+        <div class="btn-group">
+          <div class="btn-radio" data-tipo="A">Tipo A</div>
+          <div class="btn-radio" data-tipo="B">Tipo B</div>
+        </div>
+      </div>
+
+      <div class="cond" id="sec-chk-B">
+        <div class="field">
+          <label>Materiales Tipo B colocados</label>
+          <div class="chk-grid" id="chk-B"></div>
+        </div>
+      </div>
+
+      <div class="cond" id="sec-chk-A">
+        <div class="field">
+          <label>Materiales Tipo A colocados</label>
+          <div class="chk-grid" id="chk-A"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>El material esta en buen estado y visible para el cliente</label>
+        <select id="sel-estado">
+          <option value="" disabled selected>— Seleccionar —</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Foto del material colocado en el local</div>
+    <div class="foto-zona" id="foto-zona">
+      <input type="file" id="input-fotos" accept="image/*" multiple>
+      <p>Tocar para seleccionar fotos o arrastrar aqui<br>
+        <small>Minimo 1 — Maximo 6 — Se comprimen a 1920px automaticamente</small></p>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="foto-counter warn" id="foto-counter">Sin fotos — Se requiere al menos 1</div>
+    <div class="fotos-grid" id="fotos-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Observaciones <span style="font-size:.7rem;color:var(--gris-3);text-transform:none;font-weight:400">(obligatorio)</span></div>
+    <textarea id="observaciones" placeholder="Escribi tus observaciones aqui..."></textarea>
+  </div>
+
+  <button class="btn-enviar" id="btn-enviar" onclick="enviar()" disabled>
+    <div class="spinner" id="spinner"></div>
+    <span id="btn-lbl">Enviar Fiscalizacion</span>
+  </button>
+
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbwyJsau8NlP-NgrBssSUviFDaRhB6LuIWUccKMLXW5NBgsAbiRFfyX8rPDgvJBixdvOiQ/exec';
+
+const S = {
+  locales:[], materialesA:[], materialesB:[],
+  localSel:null, tipoMat:null, fotos:[], enviando:false
 };
 
-// ── GET → devuelve datos iniciales al formulario ──────────────
-function doGet(e) {
-  try {
-    return respuestaJSON_(getDatosIniciales_());
-  } catch(err) {
-    return respuestaJSON_({ ok: false, error: err.message });
+document.addEventListener('DOMContentLoaded', () => {
+  const hoy = new Date();
+  document.getElementById('fecha-hoy').textContent =
+    hoy.toLocaleDateString('es-PY', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  overlay('Cargando datos de la planilla...');
+  fetch(API_URL)
+    .then(r => r.json())
+    .then(init)
+    .catch(e => { hideOverlay(); toast('Error al cargar: ' + e.message, 'err'); });
+});
+
+function init(d) {
+  hideOverlay();
+  if (!d.ok) { toast('Error: ' + d.error, 'err'); return; }
+  S.locales     = d.locales     || [];
+  S.materialesA = d.materialesA || [];
+  S.materialesB = d.materialesB || [];
+  poblar('sel-fiscalizador', d.fiscalizadores, '— Seleccionar Fiscalizador —');
+  poblar('sel-beneficio',    d.beneficios,     '— Seleccionar Beneficio —');
+  poblar('sel-tipo-oferta',  d.tiposOferta,    '— Seleccionar Tipo de Oferta —');
+  poblar('sel-estado',       d.estadoVisual,   '— Seleccionar Estado —');
+  initBuscador(); initRadios(); initFotos(); initListeners();
+  validar();
+}
+
+function poblar(id, lista, ph) {
+  const s = document.getElementById(id);
+  s.innerHTML = '<option value="" disabled selected>' + ph + '</option>';
+  (lista||[]).forEach(v => {
+    const o = document.createElement('option');
+    o.value = o.textContent = v;
+    s.appendChild(o);
+  });
+}
+
+function initBuscador() {
+  const inp   = document.getElementById('buscar-local');
+  const drop  = document.getElementById('dropdown-locales');
+  const badge = document.getElementById('local-badge');
+
+  inp.addEventListener('input', () => {
+    const q = inp.value.trim().toLowerCase();
+    drop.innerHTML = '';
+    if (!q) { drop.classList.remove('open'); return; }
+    const hits = S.locales.filter(l => l.toLowerCase().includes(q)).slice(0, 30);
+    if (!hits.length) {
+      drop.innerHTML = '<div class="dropdown-item" style="color:var(--gris-3)">Sin resultados</div>';
+    } else {
+      hits.forEach(local => {
+        const d = document.createElement('div');
+        d.className = 'dropdown-item';
+        const idx = local.toLowerCase().indexOf(q);
+        d.innerHTML = local.slice(0,idx)
+          + '<strong>' + local.slice(idx, idx+q.length) + '</strong>'
+          + local.slice(idx+q.length);
+        d.addEventListener('click', () => elegir(local));
+        drop.appendChild(d);
+      });
+    }
+    drop.classList.add('open');
+  });
+
+  document.addEventListener('click', e => {
+    if (!document.getElementById('campo-local').contains(e.target))
+      drop.classList.remove('open');
+  });
+
+  document.getElementById('clear-local').addEventListener('click', () => {
+    S.localSel = null;
+    badge.classList.remove('show');
+    inp.value = '';
+    validar();
+  });
+
+  function elegir(local) {
+    S.localSel = local;
+    inp.value = '';
+    drop.classList.remove('open');
+    document.getElementById('badge-txt').textContent = local;
+    badge.classList.add('show');
+    validar();
   }
 }
 
-// ── POST → recibe y guarda el registro ───────────────────────
-function doPost(e) {
-  try {
-    const payload = JSON.parse(e.postData.contents);
-    return respuestaJSON_(guardarRegistro_(payload));
-  } catch(err) {
-    return respuestaJSON_({ ok: false, error: err.message });
-  }
+function initRadios() {
+  document.querySelectorAll('[data-mat]').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('[data-mat]').forEach(x => x.classList.remove('yes','no'));
+      b.classList.add(b.dataset.mat === 'SI' ? 'yes' : 'no');
+      const tieneMat = b.dataset.mat === 'SI';
+      document.getElementById('sec-mat').classList.toggle('on', tieneMat);
+      if (!tieneMat) {
+        S.tipoMat = null;
+        document.querySelectorAll('[data-tipo]').forEach(x => x.classList.remove('sel'));
+        document.getElementById('sec-chk-A').classList.remove('on');
+        document.getElementById('sec-chk-B').classList.remove('on');
+      }
+      validar();
+    });
+  });
+
+  document.querySelectorAll('[data-tipo]').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('[data-tipo]').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      S.tipoMat = b.dataset.tipo;
+      document.getElementById('sec-chk-A').classList.toggle('on', S.tipoMat === 'A');
+      document.getElementById('sec-chk-B').classList.toggle('on', S.tipoMat === 'B');
+      if (S.tipoMat === 'A') buildChk('chk-A', S.materialesA);
+      if (S.tipoMat === 'B') buildChk('chk-B', S.materialesB);
+    });
+  });
 }
 
-function respuestaJSON_(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
+function buildChk(id, lista) {
+  const w = document.getElementById(id);
+  w.innerHTML = '';
+  lista.forEach(item => {
+    const lbl = document.createElement('label');
+    lbl.className = 'chk-label';
+    lbl.innerHTML = '<input type="checkbox" value="' + item + '"> ' + item;
+    w.appendChild(lbl);
+  });
 }
 
-// ── DATOS INICIALES ───────────────────────────────────────────
-function getDatosIniciales_() {
-  const ss   = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-  const hSuc = ss.getSheetByName(CONFIG.SHEET_SUCURSALES);
-  const hMod = ss.getSheetByName(CONFIG.SHEET_MODELO);
-
-  // LOCALES: col A = Tienda, col B = Shopping
-  const rowsSuc = Math.max(0, hSuc.getLastRow() - 1);
-  const locales = rowsSuc > 0
-    ? hSuc.getRange(2, 1, rowsSuc, 2).getValues()
-        .map(r => {
-          const t = String(r[0]).trim();
-          const s = String(r[1]).trim();
-          if (!t && !s) return '';
-          if (!s) return t;
-          if (!t) return s;
-          return t + ' — ' + s;
-        }).filter(Boolean)
-    : [];
-
-  // MODELO: cada columna es una lista independiente
-  // Col A: Fiscalizadores
-  // Col B: Tiene materiales (SI/NO — no se usa como lista)
-  // Col C: Beneficios
-  // Col D: Tipos de Oferta
-  // Col E: Tipo de Material (A/B — no se usa como lista)
-  // Col F: Materiales Tipo B
-  // Col G: Materiales Tipo A
-  // Col H: Estado Visual
-  function col(n) {
-    const total = hMod.getLastRow() - 1;
-    if (total <= 0) return [];
-    return hMod.getRange(2, n, total, 1).getValues()
-      .map(r => String(r[0]).trim())
-      .filter(Boolean);
-  }
-
-  return {
-    ok:             true,
-    locales,
-    fiscalizadores: col(1),
-    beneficios:     col(3),
-    tiposOferta:    col(4),
-    materialesB:    col(6),
-    materialesA:    col(7),
-    estadoVisual:   col(8),
-  };
+function getMats(tipo) {
+  const w = document.getElementById('chk-' + tipo);
+  if (!w) return [];
+  return [...w.querySelectorAll('input:checked')].map(c => c.value);
 }
 
-// ── GUARDAR REGISTRO ──────────────────────────────────────────
-function guardarRegistro_(payload) {
-  if (!payload.fotos || payload.fotos.length < CONFIG.MIN_FOTOS)
-    return { ok: false, error: 'Se requiere al menos ' + CONFIG.MIN_FOTOS + ' foto.' };
-  if (payload.fotos.length > CONFIG.MAX_FOTOS)
-    return { ok: false, error: 'Maximo ' + CONFIG.MAX_FOTOS + ' fotos.' };
-
-  // Subir fotos a Drive
-  const urls = [];
-  for (let i = 0; i < payload.fotos.length; i++) {
-    const r = guardarFoto_(payload.fotos[i].base64, payload.fotos[i].nombre);
-    if (!r.ok) return { ok: false, error: 'Error foto ' + (i+1) + ': ' + r.error };
-    urls.push(r.url);
-  }
-
-  // Fecha y hora del servidor (anti-fraude)
-  const tz    = Session.getScriptTimeZone();
-  const ahora = new Date();
-  const fecha = Utilities.formatDate(ahora, tz, 'dd/MM/yyyy');
-  const hora  = Utilities.formatDate(ahora, tz, 'HH:mm:ss');
-
-  const matsA = Array.isArray(payload.materialesA) ? payload.materialesA.join(', ') : '';
-  const matsB = Array.isArray(payload.materialesB) ? payload.materialesB.join(', ') : '';
-
-  const fila = [
-    fecha,                         // FECHA
-    hora,                          // HORA
-    payload.fiscalizador    || '', // FISCALIZADOR
-    fecha,                         // FECHA DE LA ENCUESTA (server-side)
-    payload.local           || '', // LOCALES
-    payload.tieneMateriales || '', // CUENTA CON MATERIALES
-    payload.beneficio       || '', // BENEFICIO
-    payload.tipoOferta      || '', // TIPO OFERTA
-    payload.tipoMaterial    || '', // TIPO MATERIAL
-    matsB,                         // MATERIALES TIPO B
-    matsA,                         // MATERIALES TIPO A
-    payload.estadoVisual    || '', // ESTADO VISUAL
-    ...Array.from({length: CONFIG.MAX_FOTOS}, (_, i) => urls[i] || ''),
-    payload.observaciones   || '', // OBSERVACIONES
-  ];
-
-  // Obtener o crear hoja RESPUESTAS
-  const ss    = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-  let   sheet = ss.getSheetByName(CONFIG.SHEET_RESPUESTAS);
-
-  if (!sheet) {
-    sheet = ss.insertSheet(CONFIG.SHEET_RESPUESTAS);
-    const headers = [
-      'FECHA',
-      'HORA',
-      'FISCALIZADOR',
-      'FECHA DE LA ENCUESTA',
-      'LOCALES',
-      '¿EL LOCAL CUENTA CON LOS MATERIALES DESIGNADOS?',
-      '¿CUÁL ES EL BENEFICIO QUE OFRECE ESTE ALIADO?',
-      '¿QUÉ TIPO DE OFERTA CORRESPONDE A ESTE LOCAL?',
-      '¿QUÉ TIPO DE MATERIAL TIENE ESTE ALIADO ASIGNADO?',
-      '[SI ES TIPO B] ¿QUÉ MATERIALES TIPO B ESTÁN COLOCADOS?',
-      '[SI ES TIPO A] ¿QUÉ MATERIALES TIPO A ESTÁN COLOCADOS?',
-      'EL MATERIAL ESTÁ EN BUEN ESTADO Y VISIBLE PARA EL CLIENTE?',
-      'FOTO 1','FOTO 2','FOTO 3','FOTO 4','FOTO 5','FOTO 6',
-      'OBSERVACIONES',
-    ];
-    sheet.getRange(1, 1, 1, headers.length)
-      .setValues([headers])
-      .setFontWeight('bold')
-      .setBackground('#003087')
-      .setFontColor('#ffffff');
-    sheet.setFrozenRows(1);
-  }
-
-  const row = sheet.getLastRow() + 1;
-  sheet.getRange(row, 1, 1, fila.length).setValues([fila]);
-
-  // Insertar =IMAGE() en columnas de fotos (columnas 13 a 18)
-  for (let i = 0; i < urls.length; i++) {
-    sheet.getRange(row, 13 + i)
-      .setFormula('=IMAGE("' + urls[i] + '",4,80,80)');
-  }
-  if (urls.length) sheet.setRowHeight(row, 90);
-
-  return { ok: true, fila: row, fotos: urls };
+function getTieneMat() {
+  const b = document.querySelector('[data-mat].yes, [data-mat].no');
+  return b ? b.dataset.mat : '';
 }
 
-// ── SUBIR FOTO A DRIVE ────────────────────────────────────────
-function guardarFoto_(base64Data, nombre) {
-  try {
-    const raw  = base64Data.replace(/^data:image\/\w+;base64,/, '');
-    const blob = Utilities.newBlob(
-      Utilities.base64Decode(raw),
-      'image/jpeg',
-      nombre
-    );
-    const file = DriveApp.getFolderById(CONFIG.DRIVE_FOLDER_ID).createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    return {
-      ok:  true,
-      url: 'https://drive.google.com/uc?export=view&id=' + file.getId(),
+function initFotos() {
+  document.getElementById('input-fotos').addEventListener('change', e => procArchivos(e.target.files));
+  const z = document.getElementById('foto-zona');
+  z.addEventListener('dragover',  e => { e.preventDefault(); z.classList.add('drag'); });
+  z.addEventListener('dragleave', () => z.classList.remove('drag'));
+  z.addEventListener('drop', e => {
+    e.preventDefault(); z.classList.remove('drag');
+    procArchivos(e.dataTransfer.files);
+  });
+}
+
+function procArchivos(files) {
+  const libre = 6 - S.fotos.length;
+  if (libre <= 0) { toast('Maximo 6 fotos', 'err'); return; }
+  [...files].slice(0, libre).forEach(f => { if (f.type.startsWith('image/')) procFoto(f); });
+}
+
+function procFoto(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1920;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w >= h) { h = Math.round(h * MAX / w); w = MAX; }
+        else        { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = cv.toDataURL('image/jpeg', 0.88);
+      const loc   = (S.localSel || 'LOCAL').replace(/[^A-Z0-9]/gi,'_').toUpperCase();
+      const fisc  = (document.getElementById('sel-fiscalizador').value || 'FISC').replace(/\s+/g,'_').toUpperCase();
+      const d     = new Date();
+      const fecha = d.getFullYear()
+        + String(d.getMonth()+1).padStart(2,'0')
+        + String(d.getDate()).padStart(2,'0');
+      const nombre = loc + '_' + fisc + '_' + fecha + '_' + String(S.fotos.length+1).padStart(2,'0') + '.jpg';
+      S.fotos.push({ dataUrl, nombre });
+      renderThumbs(); actualizarContador(); validar();
     };
-  } catch(e) {
-    return { ok: false, error: e.message };
-  }
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
+
+function renderThumbs() {
+  const g = document.getElementById('fotos-grid');
+  g.innerHTML = '';
+  S.fotos.forEach((f,i) => {
+    const d = document.createElement('div');
+    d.className = 'thumb';
+    d.innerHTML = '<img src="' + f.dataUrl + '" alt="foto ' + (i+1) + '">'
+      + '<span class="num">' + (i+1) + '</span>'
+      + '<button class="del" onclick="delFoto(' + i + ')">x</button>';
+    g.appendChild(d);
+  });
+}
+
+function delFoto(i) { S.fotos.splice(i,1); renderThumbs(); actualizarContador(); validar(); }
+
+function actualizarContador() {
+  const n  = S.fotos.length;
+  const el = document.getElementById('foto-counter');
+  document.getElementById('progress-fill').style.width = Math.round(n/6*100) + '%';
+  el.className = 'foto-counter ' + (n >= 1 ? 'ok' : 'warn');
+  el.textContent = n === 0
+    ? 'Sin fotos — Se requiere al menos 1'
+    : n + ' de 6 foto(s) cargada(s)';
+}
+
+function initListeners() {
+  ['sel-fiscalizador','sel-beneficio','sel-tipo-oferta','sel-estado']
+    .forEach(id => document.getElementById(id)?.addEventListener('change', validar));
+  document.getElementById('observaciones').addEventListener('input', validar);
+}
+
+function validar() {
+  const ok = S.localSel
+    && document.getElementById('sel-fiscalizador').value
+    && getTieneMat()
+    && S.fotos.length >= 1
+    && document.getElementById('observaciones').value.trim();
+  document.getElementById('btn-enviar').disabled = !ok;
+}
+
+function enviar() {
+  if (S.enviando) return;
+  S.enviando = true;
+  document.getElementById('btn-enviar').disabled = true;
+  document.getElementById('spinner').style.display = 'inline-block';
+  document.getElementById('btn-lbl').textContent = 'Enviando...';
+  overlay('Subiendo fotos a Drive...', 'Esto puede tomar unos segundos');
+
+  const payload = {
+    fiscalizador:    document.getElementById('sel-fiscalizador').value,
+    local:           S.localSel,
+    tieneMateriales: getTieneMat(),
+    beneficio:       document.getElementById('sel-beneficio').value || '',
+    tipoOferta:      document.getElementById('sel-tipo-oferta').value || '',
+    tipoMaterial:    S.tipoMat ? 'Tipo ' + S.tipoMat : '',
+    materialesA:     getMats('A'),
+    materialesB:     getMats('B'),
+    estadoVisual:    document.getElementById('sel-estado').value || '',
+    observaciones:   document.getElementById('observaciones').value.trim(),
+    fotos: S.fotos.map(f => ({ base64: f.dataUrl, nombre: f.nombre })),
+  };
+
+  fetch(API_URL, { method:'POST', body: JSON.stringify(payload) })
+    .then(r => r.json())
+    .then(res => {
+      hideOverlay(); S.enviando = false; resetBtn();
+      if (res.ok) { toast('Registro guardado correctamente', 'ok'); resetForm(); }
+      else        { toast('Error: ' + res.error, 'err'); validar(); }
+    })
+    .catch(e => {
+      hideOverlay(); S.enviando = false; resetBtn();
+      toast('Error de conexion: ' + e.message, 'err'); validar();
+    });
+}
+
+function resetBtn() {
+  document.getElementById('spinner').style.display = 'none';
+  document.getElementById('btn-lbl').textContent = 'Enviar Fiscalizacion';
+}
+
+function resetForm() {
+  ['sel-fiscalizador','sel-beneficio','sel-tipo-oferta','sel-estado']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('observaciones').value = '';
+  document.getElementById('buscar-local').value = '';
+  document.getElementById('local-badge').classList.remove('show');
+  document.querySelectorAll('[data-mat],[data-tipo]').forEach(b =>
+    b.classList.remove('yes','no','sel'));
+  document.getElementById('sec-mat').classList.remove('on');
+  document.getElementById('sec-chk-A').classList.remove('on');
+  document.getElementById('sec-chk-B').classList.remove('on');
+  S.localSel = null; S.tipoMat = null; S.fotos = []; S.enviando = false;
+  renderThumbs(); actualizarContador(); validar();
+}
+
+function overlay(msg, sub) {
+  document.getElementById('overlay-msg').textContent = msg || 'Procesando...';
+  document.getElementById('overlay-sub').textContent = sub || '';
+  document.getElementById('overlay').classList.add('on');
+}
+function hideOverlay() { document.getElementById('overlay').classList.remove('on'); }
+
+let _tt;
+function toast(msg, tipo) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast ' + tipo;
+  clearTimeout(_tt);
+  requestAnimationFrame(() => el.classList.add('on'));
+  _tt = setTimeout(() => el.classList.remove('on'), 5000);
+}
+</script>
+</body>
+</html>
