@@ -1,71 +1,192 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Fiscalización · Banco Familiar</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --azul:#003087;--azul-d:#00205e;--amarillo:#FFD100;
-  --rojo:#C8102E;--verde:#1e7e34;--gris-1:#f8f9fa;
-  --gris-2:#e8eaed;--gris-3:#9aa0a6;--txt:#202124;
-  --radius:12px;--shadow:0 2px 12px rgba(0,0,0,.1);
+// ============================================================
+//  SISTEMA DE FISCALIZACIÓN — BANCO FAMILIAR
+//  Código.gs · Versión GitHub Pages (API Mode)
+// ============================================================
+
+const CONFIG = {
+  SPREADSHEET_ID:   '1TNAQtvRbgLZ0NfwEYGLJTC-x-MQgy0CaDQgLNrhPhPs',
+  SHEET_SUCURSALES: 'SUCURSALES',
+  SHEET_MODELO:     'MODELO',
+  SHEET_RESPUESTAS: 'RESPUESTAS',
+  DRIVE_FOLDER_ID:  '1UtO-Q6_QAnP6D9IrknPYXUqhnWap3cRP',
+  MAX_FOTOS: 6,
+  MIN_FOTOS: 1,
+};
+
+// ── GET → devuelve datos iniciales al formulario ──────────────
+function doGet(e) {
+  try {
+    return respuestaJSON_(getDatosIniciales_());
+  } catch(err) {
+    return respuestaJSON_({ ok: false, error: err.message });
+  }
 }
-body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f3f4;color:var(--txt);min-height:100vh}
 
-.header{background:var(--azul);padding:14px 20px;display:flex;align-items:center;gap:14px;
-  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.header img{width:48px;height:48px;object-fit:contain;border-radius:8px;background:#fff;padding:2px}
-.header h1{color:#fff;font-size:1.1rem;font-weight:700;line-height:1.2}
-.header p{color:rgba(255,255,255,.75);font-size:.75rem;margin-top:2px}
+// ── POST → recibe y guarda el registro ───────────────────────
+function doPost(e) {
+  try {
+    const payload = JSON.parse(e.postData.contents);
+    return respuestaJSON_(guardarRegistro_(payload));
+  } catch(err) {
+    return respuestaJSON_({ ok: false, error: err.message });
+  }
+}
 
-.container{max-width:660px;margin:20px auto;padding:0 14px 60px}
+function respuestaJSON_(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
 
-.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
-.card-title{font-size:.7rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--azul);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.card-title::after{content:'';flex:1;height:1px;background:var(--gris-2)}
+// ── DATOS INICIALES ───────────────────────────────────────────
+function getDatosIniciales_() {
+  const ss   = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  const hSuc = ss.getSheetByName(CONFIG.SHEET_SUCURSALES);
+  const hMod = ss.getSheetByName(CONFIG.SHEET_MODELO);
 
-.field{margin-bottom:13px}
-.field:last-child{margin-bottom:0}
-.field label{display:block;font-size:.8rem;font-weight:600;color:#5f6368;margin-bottom:5px}
-.req{color:var(--rojo);margin-left:2px}
+  // LOCALES: col A = Tienda, col B = Shopping
+  const rowsSuc = Math.max(0, hSuc.getLastRow() - 1);
+  const locales = rowsSuc > 0
+    ? hSuc.getRange(2, 1, rowsSuc, 2).getValues()
+        .map(r => {
+          const t = String(r[0]).trim();
+          const s = String(r[1]).trim();
+          if (!t && !s) return '';
+          if (!s) return t;
+          if (!t) return s;
+          return t + ' — ' + s;
+        }).filter(Boolean)
+    : [];
 
-.fecha-display{width:100%;padding:10px 14px;border:1.5px solid var(--gris-2);border-radius:8px;
-  font-size:.88rem;background:var(--gris-1);color:#5f6368;font-weight:600;
-  display:flex;align-items:center;gap:8px}
-.fecha-display span{color:var(--azul)}
-.fecha-display small{margin-left:auto;font-size:.7rem;color:var(--gris-3)}
+  // MODELO: cada columna es una lista independiente
+  // Col A: Fiscalizadores
+  // Col B: Tiene materiales (SI/NO — no se usa como lista)
+  // Col C: Beneficios
+  // Col D: Tipos de Oferta
+  // Col E: Tipo de Material (A/B — no se usa como lista)
+  // Col F: Materiales Tipo B
+  // Col G: Materiales Tipo A
+  // Col H: Estado Visual
+  function col(n) {
+    const total = hMod.getLastRow() - 1;
+    if (total <= 0) return [];
+    return hMod.getRange(2, n, total, 1).getValues()
+      .map(r => String(r[0]).trim())
+      .filter(Boolean);
+  }
 
-select{width:100%;padding:10px 14px;border:1.5px solid var(--gris-2);border-radius:8px;
-  font-size:.94rem;color:var(--txt);background:var(--gris-1);
-  -webkit-appearance:none;appearance:none;font-family:inherit;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 10px center;padding-right:36px;cursor:pointer;
-  transition:border-color .18s,box-shadow .18s}
-select:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,48,135,.14);background-color:#fff}
+  return {
+    ok:             true,
+    locales,
+    fiscalizadores: col(1),
+    beneficios:     col(3),
+    tiposOferta:    col(4),
+    materialesB:    col(6),
+    materialesA:    col(7),
+    estadoVisual:   col(8),
+  };
+}
 
-.search-wrap{position:relative}
-.search-input{width:100%;padding:10px 14px 10px 14px;border:1.5px solid var(--gris-2);
-  border-radius:8px;font-size:.94rem;background:var(--gris-1);font-family:inherit;
-  color:var(--txt);transition:border-color .18s,box-shadow .18s;-webkit-appearance:none}
-.search-input:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,48,135,.14);background-color:#fff}
-.dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;
-  background:#fff;border:1.5px solid var(--azul);border-radius:8px;
-  max-height:220px;overflow-y:auto;box-shadow:0 4px 18px rgba(0,0,0,.13);z-index:50}
-.dropdown.open{display:block}
-.dropdown-item{padding:10px 14px;cursor:pointer;font-size:.91rem;
-  border-bottom:1px solid var(--gris-2);transition:background .15s}
-.dropdown-item:last-child{border-bottom:none}
-.dropdown-item:hover{background:#e8f0fe;color:var(--azul)}
-.dropdown-item strong{color:var(--azul)}
-.local-badge{display:none;margin-top:8px;padding:9px 14px;background:#e8f0fe;
-  border-radius:8px;font-size:.88rem;font-weight:600;color:var(--azul-d);align-items:center;gap:8px}
-.local-badge.show{display:flex}
-.local-badge .clear{margin-left:auto;cursor:pointer;font-size:.78rem;
-  color:var(--gris-3);border:none;background:none;padding:0}
-.local-badge .clear:hover{color:var(--rojo)}
+// ── GUARDAR REGISTRO ──────────────────────────────────────────
+function guardarRegistro_(payload) {
+  if (!payload.fotos || payload.fotos.length < CONFIG.MIN_FOTOS)
+    return { ok: false, error: 'Se requiere al menos ' + CONFIG.MIN_FOTOS + ' foto.' };
+  if (payload.fotos.length > CONFIG.MAX_FOTOS)
+    return { ok: false, error: 'Maximo ' + CONFIG.MAX_FOTOS + ' fotos.' };
 
-.btn-group{display:flex;gap:8px;flex-wrap:wrap}
-.btn-radio{flex:1;min-width:80px;padding:10px 8px;borde
+  // Subir fotos a Drive
+  const urls = [];
+  for (let i = 0; i < payload.fotos.length; i++) {
+    const r = guardarFoto_(payload.fotos[i].base64, payload.fotos[i].nombre);
+    if (!r.ok) return { ok: false, error: 'Error foto ' + (i+1) + ': ' + r.error };
+    urls.push(r.url);
+  }
+
+  // Fecha y hora del servidor (anti-fraude)
+  const tz    = Session.getScriptTimeZone();
+  const ahora = new Date();
+  const fecha = Utilities.formatDate(ahora, tz, 'dd/MM/yyyy');
+  const hora  = Utilities.formatDate(ahora, tz, 'HH:mm:ss');
+
+  const matsA = Array.isArray(payload.materialesA) ? payload.materialesA.join(', ') : '';
+  const matsB = Array.isArray(payload.materialesB) ? payload.materialesB.join(', ') : '';
+
+  const fila = [
+    fecha,                         // FECHA
+    hora,                          // HORA
+    payload.fiscalizador    || '', // FISCALIZADOR
+    fecha,                         // FECHA DE LA ENCUESTA (server-side)
+    payload.local           || '', // LOCALES
+    payload.tieneMateriales || '', // CUENTA CON MATERIALES
+    payload.beneficio       || '', // BENEFICIO
+    payload.tipoOferta      || '', // TIPO OFERTA
+    payload.tipoMaterial    || '', // TIPO MATERIAL
+    matsB,                         // MATERIALES TIPO B
+    matsA,                         // MATERIALES TIPO A
+    payload.estadoVisual    || '', // ESTADO VISUAL
+    ...Array.from({length: CONFIG.MAX_FOTOS}, (_, i) => urls[i] || ''),
+    payload.observaciones   || '', // OBSERVACIONES
+  ];
+
+  // Obtener o crear hoja RESPUESTAS
+  const ss    = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  let   sheet = ss.getSheetByName(CONFIG.SHEET_RESPUESTAS);
+
+  if (!sheet) {
+    sheet = ss.insertSheet(CONFIG.SHEET_RESPUESTAS);
+    const headers = [
+      'FECHA',
+      'HORA',
+      'FISCALIZADOR',
+      'FECHA DE LA ENCUESTA',
+      'LOCALES',
+      '¿EL LOCAL CUENTA CON LOS MATERIALES DESIGNADOS?',
+      '¿CUÁL ES EL BENEFICIO QUE OFRECE ESTE ALIADO?',
+      '¿QUÉ TIPO DE OFERTA CORRESPONDE A ESTE LOCAL?',
+      '¿QUÉ TIPO DE MATERIAL TIENE ESTE ALIADO ASIGNADO?',
+      '[SI ES TIPO B] ¿QUÉ MATERIALES TIPO B ESTÁN COLOCADOS?',
+      '[SI ES TIPO A] ¿QUÉ MATERIALES TIPO A ESTÁN COLOCADOS?',
+      'EL MATERIAL ESTÁ EN BUEN ESTADO Y VISIBLE PARA EL CLIENTE?',
+      'FOTO 1','FOTO 2','FOTO 3','FOTO 4','FOTO 5','FOTO 6',
+      'OBSERVACIONES',
+    ];
+    sheet.getRange(1, 1, 1, headers.length)
+      .setValues([headers])
+      .setFontWeight('bold')
+      .setBackground('#003087')
+      .setFontColor('#ffffff');
+    sheet.setFrozenRows(1);
+  }
+
+  const row = sheet.getLastRow() + 1;
+  sheet.getRange(row, 1, 1, fila.length).setValues([fila]);
+
+  // Insertar =IMAGE() en columnas de fotos (columnas 13 a 18)
+  for (let i = 0; i < urls.length; i++) {
+    sheet.getRange(row, 13 + i)
+      .setFormula('=IMAGE("' + urls[i] + '",4,80,80)');
+  }
+  if (urls.length) sheet.setRowHeight(row, 90);
+
+  return { ok: true, fila: row, fotos: urls };
+}
+
+// ── SUBIR FOTO A DRIVE ────────────────────────────────────────
+function guardarFoto_(base64Data, nombre) {
+  try {
+    const raw  = base64Data.replace(/^data:image\/\w+;base64,/, '');
+    const blob = Utilities.newBlob(
+      Utilities.base64Decode(raw),
+      'image/jpeg',
+      nombre
+    );
+    const file = DriveApp.getFolderById(CONFIG.DRIVE_FOLDER_ID).createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return {
+      ok:  true,
+      url: 'https://drive.google.com/uc?export=view&id=' + file.getId(),
+    };
+  } catch(e) {
+    return { ok: false, error: e.message };
+  }
+}
