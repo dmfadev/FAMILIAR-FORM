@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fiscalización · Banco Familiar</title>
+  <?!= include('Styles'); ?>
+</head>
+<body>
+
+<!-- ── OVERLAY ── -->
+<div class="overlay" id="overlay">
+  <div class="big-spin"></div>
+  <div id="overlay-msg">Procesando...</div>
+  <div class="overlay-sub" id="overlay-sub"></div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <svg width="34" height="34" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+    <path d="M9 2L7 4H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0
+      2-.9 2-2V6c0-1.1-.9-2-2-2h-3l-2-2H9zm3 14c-2.76
+      0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65
+      0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/>
+  </svg>
+  <div>
+    <h1>Sistema de Fiscalización</h1>
+    <p>Banco Familiar · Relevamiento de locales</p>
+  </div>
+</div>
+
+<!-- ── FORMULARIO ── -->
+<div class="container">
+
+  <!-- 1. IDENTIFICACIÓN -->
+  <div class="card">
+    <div class="card-title">👤 Identificación</div>
+
+    <div class="field">
+      <label for="sel-fiscalizador">Fiscalizador <span class="req">*</span></label>
+      <select id="sel-fiscalizador">
+        <option value="" disabled selected>Cargando...</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="fecha-encuesta">Fecha de encuesta <span class="req">*</span></label>
+      <input type="date" id="fecha-encuesta">
+    </div>
+  </div>
+
+  <!-- 2. LOCAL -->
+  <div class="card">
+    <div class="card-title">🏪 Local</div>
+
+    <div class="field" id="campo-local">
+      <label>Buscar local <span class="req">*</span></label>
+      <div class="search-wrap">
+        <input
+          type="text"
+          id="buscar-local"
+          class="search-input"
+          placeholder="Escribí tienda o shopping..."
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false">
+        <div class="dropdown" id="dropdown-locales"></div>
+      </div>
+      <div class="local-badge" id="local-badge">
+        📍 <span id="badge-txt"></span>
+        <button class="clear-local" id="clear-local" title="Cambiar local">✕ cambiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. MATERIALES -->
+  <div class="card">
+    <div class="card-title">📦 Materiales</div>
+
+    <div class="field">
+      <label>¿Cuenta con materiales? <span class="req">*</span></label>
+      <div class="btn-group">
+        <div class="btn-radio" data-mat="Sí">✅ Sí</div>
+        <div class="btn-radio" data-mat="No">❌ No</div>
+        <div class="btn-radio" data-mat="Parcial">⚠️ Parcial</div>
+      </div>
+    </div>
+
+    <!-- Condicional: si tiene materiales -->
+    <div class="condicional" id="sec-materiales">
+      <div class="field">
+        <label>Tipo de material</label>
+        <div class="btn-group">
+          <div class="btn-radio" data-tipo="A">Tipo A</div>
+          <div class="btn-radio" data-tipo="B">Tipo B</div>
+        </div>
+      </div>
+
+      <div class="condicional" id="sec-chk-A">
+        <div class="field">
+          <label>Materiales Tipo A colocados</label>
+          <div class="tipo-mat-wrap">
+            <div class="checkbox-grid" id="chk-A"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="condicional" id="sec-chk-B">
+        <div class="field">
+          <label>Materiales Tipo B colocados</label>
+          <div class="tipo-mat-wrap">
+            <div class="checkbox-grid" id="chk-B"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. OFERTA & ESTADO -->
+  <div class="card">
+    <div class="card-title">🏷️ Oferta & Estado</div>
+
+    <div class="field">
+      <label for="sel-beneficio">Beneficio <span class="req">*</span></label>
+      <select id="sel-beneficio">
+        <option value="" disabled selected>— Seleccionar —</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="sel-tipo-oferta">Tipo de oferta <span class="req">*</span></label>
+      <select id="sel-tipo-oferta">
+        <option value="" disabled selected>— Seleccionar —</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="sel-estado">Estado visual <span class="req">*</span></label>
+      <select id="sel-estado">
+        <option value="" disabled selected>— Seleccionar —</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 5. FOTOS -->
+  <div class="card">
+    <div class="card-title">📷 Evidencia fotográfica</div>
+
+    <div class="foto-zone" id="foto-zona">
+      <input type="file" id="input-fotos" accept="image/*" multiple>
+      <div class="foto-icon">📸</div>
+      <p>
+        Tocá para seleccionar fotos o arrastrá aquí<br>
+        <small>Mínimo 2 · Máximo 6 · Se comprimen automáticamente a 1920px</small>
+      </p>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="foto-counter warn" id="foto-counter">
+      Sin fotos · Se requieren al menos 2
+    </div>
+
+    <div class="fotos-grid" id="fotos-grid"></div>
+  </div>
+
+  <!-- 6. OBSERVACIONES -->
+  <div class="card">
+    <div class="card-title">📝 Observaciones</div>
+    <textarea
+      id="observaciones"
+      placeholder="Campo libre — anotá cualquier observación adicional...">
+    </textarea>
+  </div>
+
+  <!-- BOTÓN ENVIAR -->
+  <button class="btn-enviar" id="btn-enviar" onclick="enviarFormulario()" disabled>
+    <div class="spinner"></div>
+    <span class="lbl">Enviar Fiscalización</span>
+  </button>
+
+</div><!-- /container -->
+
+<?!= include('Scripts'); ?>
+</body>
+</html>
