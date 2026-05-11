@@ -20,17 +20,17 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f3f4;color:var(--txt)
 .header h1{color:#fff;font-size:1.05rem;font-weight:700;line-height:1.2}
 .header p{color:rgba(255,255,255,.72);font-size:.73rem;margin-top:2px}
 
-/* STEPS */
 .steps{display:flex;background:#fff;border-bottom:2px solid var(--gris-2);
   padding:0 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.step-btn{flex-shrink:0;padding:11px 12px;font-size:.75rem;font-weight:600;
-  color:var(--gris-3);border:none;background:none;cursor:pointer;
-  border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.step-btn{flex-shrink:0;padding:11px 12px;font-size:.72rem;font-weight:700;
+  letter-spacing:.06em;color:var(--gris-3);border:none;background:none;cursor:pointer;
+  border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;
+  text-transform:uppercase}
 .step-btn.active{color:var(--azul);border-bottom-color:var(--azul)}
-.step-btn.done{color:var(--verde);border-bottom-color:var(--verde)}
+.step-btn.done{color:var(--verde);border-bottom-color:var(--verde);cursor:pointer}
+.step-btn.locked{cursor:not-allowed;opacity:.5}
 
 .container{max-width:660px;margin:0 auto;padding:16px 14px 90px}
-
 .paso{display:none}.paso.active{display:block}
 
 .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
@@ -43,13 +43,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f3f4;color:var(--txt)
 .field label{display:block;font-size:.82rem;font-weight:600;color:#5f6368;margin-bottom:8px;line-height:1.4}
 .req{color:var(--rojo);margin-left:2px}
 
-/* FECHA */
 .fecha-box{padding:10px 14px;border:1.5px solid var(--gris-2);border-radius:8px;
   font-size:.9rem;background:var(--gris-1);color:var(--azul);font-weight:600;
   display:flex;align-items:center;justify-content:space-between}
 .fecha-box small{font-size:.7rem;color:var(--gris-3);font-weight:400}
 
-/* SELECT */
 select{width:100%;padding:11px 14px;border:1.5px solid var(--gris-2);border-radius:8px;
   font-size:.94rem;color:var(--txt);background:var(--gris-1);
   -webkit-appearance:none;appearance:none;font-family:inherit;
@@ -57,7 +55,6 @@ select{width:100%;padding:11px 14px;border:1.5px solid var(--gris-2);border-radi
   background-repeat:no-repeat;background-position:right 10px center;padding-right:36px;cursor:pointer}
 select:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,48,135,.12);background:#fff}
 
-/* BUSCADOR */
 .search-wrap{position:relative}
 .search-input{width:100%;padding:11px 14px;border:1.5px solid var(--gris-2);
   border-radius:8px;font-size:.94rem;background:var(--gris-1);font-family:inherit;
@@ -81,20 +78,36 @@ select:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,4
   color:var(--gris-3);border:none;background:none;padding:2px 6px}
 .local-badge .clear:hover{color:var(--rojo)}
 
+/* OPCIONES SI/NO */
+.sino-group{display:flex;gap:8px;margin-bottom:10px}
+.sino-btn{flex:1;padding:11px;border:2px solid var(--gris-2);border-radius:8px;
+  background:var(--gris-1);font-size:.9rem;font-weight:700;cursor:pointer;
+  text-align:center;transition:all .15s;color:#5f6368;user-select:none}
+.sino-btn.si{border-color:var(--verde);background:#e6f4ea;color:var(--verde)}
+.sino-btn.no{border-color:var(--rojo);background:#fce8e6;color:var(--rojo)}
+
 /* OPCIONES RADIO */
 .opciones{display:flex;flex-direction:column;gap:7px}
 .opcion{display:flex;align-items:center;gap:12px;padding:11px 14px;
   border:1.5px solid var(--gris-2);border-radius:8px;cursor:pointer;
-  background:var(--gris-1);transition:all .15s;font-size:.9rem;line-height:1.3;
-  user-select:none}
-.opcion:active{transform:scale(.99)}
+  background:var(--gris-1);transition:all .15s;font-size:.9rem;line-height:1.3;user-select:none}
 .opcion.sel{border-color:var(--azul);background:#e8f0fe;color:var(--azul);font-weight:600}
 .radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--gris-3);
   flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .opcion.sel .radio{border-color:var(--azul);background:var(--azul)}
 .opcion.sel .radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
 
-/* CONDICIONAL */
+/* CHECKBOXES */
+.chk-lista{display:flex;flex-direction:column;gap:7px;margin-top:4px}
+.chk-item{display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border:1.5px solid var(--gris-2);border-radius:8px;cursor:pointer;
+  background:var(--gris-1);font-size:.9rem;transition:all .15s;user-select:none}
+.chk-item.sel{border-color:var(--azul);background:#e8f0fe;color:var(--azul);font-weight:600}
+.chk-box{width:20px;height:20px;border-radius:5px;border:2px solid var(--gris-3);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.chk-item.sel .chk-box{border-color:var(--azul);background:var(--azul)}
+.chk-item.sel .chk-box::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+
 .cond{display:none}.cond.on{display:block}
 
 /* FOTOS */
@@ -106,18 +119,22 @@ select:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,4
 .foto-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .foto-btn .fico{font-size:1.3rem;display:block;margin-bottom:5px}
 
-.progress-bar{height:4px;background:var(--gris-2);border-radius:4px;overflow:hidden;margin-bottom:8px}
-.progress-fill{height:100%;border-radius:4px;transition:width .3s}
-.progress-fill.bf{background:var(--azul)}
-.progress-fill.warn{background:#856404}
-.progress-fill.ok{background:var(--verde)}
+/* OPCION NO FOTO */
+.no-foto-btn{width:100%;padding:12px;border:1.5px dashed var(--gris-3);border-radius:10px;
+  background:var(--gris-1);font-size:.86rem;font-weight:600;color:var(--gris-3);
+  cursor:pointer;text-align:center;transition:all .15s;margin-bottom:10px}
+.no-foto-btn.sel{border-color:var(--naranja,#856404);background:#fef9e7;color:#856404}
+.no-foto-obs{display:none;margin-top:8px}
+.no-foto-obs.on{display:block}
+.no-foto-obs textarea{min-height:72px}
 
+.progress-bar{height:4px;background:var(--gris-2);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;border-radius:4px;transition:width .3s;background:var(--azul)}
 .foto-counter{font-size:.81rem;font-weight:600;text-align:center;margin-bottom:10px}
 .foto-counter.warn{color:#856404}.foto-counter.ok{color:var(--verde)}
 
 .fotos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;
-  border:2px solid var(--gris-2)}
+.thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;border:2px solid var(--gris-2)}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .thumb .num{position:absolute;bottom:4px;left:5px;background:rgba(0,0,0,.55);
   color:#fff;font-size:.66rem;font-weight:700;padding:1px 5px;border-radius:4px}
@@ -132,10 +149,8 @@ textarea{width:100%;padding:11px 14px;border:1.5px solid var(--gris-2);border-ra
 textarea:focus{outline:none;border-color:var(--azul);
   box-shadow:0 0 0 3px rgba(0,48,135,.12);background:#fff}
 
-/* NAV */
 .nav-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;
-  border-top:1px solid var(--gris-2);padding:10px 16px;
-  display:flex;gap:10px;z-index:100}
+  border-top:1px solid var(--gris-2);padding:10px 16px;display:flex;gap:10px;z-index:100}
 .btn-nav{flex:1;padding:13px;border-radius:10px;font-size:.94rem;
   font-weight:700;border:none;cursor:pointer;transition:all .18s}
 .btn-prev{background:var(--gris-2);color:#5f6368}
@@ -144,11 +159,7 @@ textarea:focus{outline:none;border-color:var(--azul);
 .btn-next:hover:not(:disabled){background:var(--azul-d)}
 .btn-next:disabled{background:var(--gris-3);cursor:not-allowed}
 
-.spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.35);
-  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
-  display:inline-block;vertical-align:middle;margin-right:6px;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .overlay{position:fixed;inset:0;background:rgba(255,255,255,.93);
   display:none;flex-direction:column;align-items:center;justify-content:center;
   gap:14px;z-index:999;font-weight:600;color:var(--azul);font-size:.95rem}
@@ -163,6 +174,13 @@ textarea:focus{outline:none;border-color:var(--azul);
   z-index:9999;min-width:240px;text-align:center;pointer-events:none}
 .toast.on{transform:translateX(-50%) translateY(0)}
 .toast.ok{background:var(--verde)}.toast.err{background:var(--rojo)}
+
+/* BANNER BORRADOR */
+.draft-banner{background:#fef9e7;border:1px solid #f0c040;border-radius:8px;
+  padding:10px 14px;margin-bottom:14px;font-size:.82rem;color:#856404;
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+.draft-banner button{border:none;background:none;color:var(--rojo);
+  font-size:.78rem;font-weight:700;cursor:pointer;padding:2px 6px}
 </style>
 </head>
 <body>
@@ -183,17 +201,21 @@ textarea:focus{outline:none;border-color:var(--azul);
 </div>
 
 <div class="steps">
-  <button class="step-btn active" id="tab-0">1. Identificacion</button>
-  <button class="step-btn" id="tab-1">2. Local</button>
-  <button class="step-btn" id="tab-2">3. Material BF</button>
-  <button class="step-btn" id="tab-3">4. Competencia</button>
-  <button class="step-btn" id="tab-4">5. Cierre</button>
+  <button class="step-btn active" id="tab-0">IDENTIFICACION</button>
+  <button class="step-btn locked" id="tab-1">LOCAL</button>
+  <button class="step-btn locked" id="tab-2">MATERIAL BF</button>
+  <button class="step-btn locked" id="tab-3">COMPETENCIA</button>
+  <button class="step-btn locked" id="tab-4">CIERRE</button>
 </div>
 
 <div class="container">
 
   <!-- PASO 1 -->
   <div class="paso active" id="paso-0">
+    <div id="draft-banner" class="draft-banner" style="display:none">
+      Tenes un borrador guardado.
+      <button onclick="limpiarBorrador()">Descartar</button>
+    </div>
     <div class="card">
       <div class="card-title">Identificacion</div>
       <div class="field">
@@ -241,69 +263,78 @@ textarea:focus{outline:none;border-color:var(--azul);
         <div class="opciones" id="op-materialEncontrado"></div>
       </div>
 
-      <div class="field">
-        <label>Encontraste algun otro material de Banco Familiar ademas del tablentent y el calco <span class="req">*</span></label>
-        <div class="opciones" id="op-otroMaterialBF"></div>
-      </div>
+      <!-- Condicional: solo si NO es Ninguno -->
+      <div class="cond" id="sec-material-detalle">
+
+        <div class="field">
+          <label>Encontraste algun otro material de Banco Familiar <span class="req">*</span></label>
+          <div class="opciones" id="op-otroMaterialBF"></div>
+        </div>
+
+        <div class="field">
+          <label>El material esta correctamente colocado y visible desde el exterior <span class="req">*</span></label>
+          <div class="opciones" id="op-estadoMaterial"></div>
+        </div>
+
+        <div class="field">
+          <label>El material muestra correctamente la promo 13 al 15 de mayo <span class="req">*</span></label>
+          <div class="opciones" id="op-muestraPromo"></div>
+        </div>
+
+        <div class="field">
+          <label>El beneficio esta correctamente indicado (25% + 5% con QR / +10 cuotas) <span class="req">*</span></label>
+          <div class="opciones" id="op-beneficioIndicado"></div>
+        </div>
+
+      </div><!-- /sec-material-detalle -->
 
       <div class="field">
-        <label>El material esta correctamente colocado y visible desde el exterior <span class="req">*</span></label>
-        <div class="opciones" id="op-estadoMaterial"></div>
-      </div>
-
-      <div class="field">
-        <label>El material muestra correctamente la promo 13 al 15 de mayo <span class="req">*</span></label>
-        <div class="opciones" id="op-muestraPromo"></div>
-      </div>
-
-      <div class="field">
-        <label>El beneficio esta correctamente indicado (25% + 5% con QR / +10 cuotas) <span class="req">*</span></label>
-        <div class="opciones" id="op-beneficioIndicado"></div>
-      </div>
-
-      <div class="field">
-        <label>Encontraste materiales de campanas anteriores de Banco Familiar aun colocados <span class="req">*</span></label>
+        <label>Encontraste materiales de campanas anteriores aun colocados <span class="req">*</span></label>
         <div class="opciones" id="op-materialAnterior"></div>
       </div>
+
     </div>
 
+    <!-- Fotos BF -->
     <div class="card">
-      <div class="card-title">Fotos material Banco Familiar <span style="font-size:.68rem;font-weight:400;text-transform:none;color:var(--gris-3)">(obligatoria — max 6)</span></div>
+      <div class="card-title">Fotos material Banco Familiar
+        <span style="font-size:.68rem;font-weight:400;text-transform:none;color:var(--gris-3)">(obligatoria — max 6)</span>
+      </div>
       <div class="foto-btns">
         <div class="foto-btn">
           <input type="file" id="input-bf-cam" accept="image/*" capture="environment" multiple>
-          <span class="fico">[ camara ]</span>
-          <span>Tomar foto</span>
+          <span class="fico">[ camara ]</span><span>Tomar foto</span>
         </div>
         <div class="foto-btn">
           <input type="file" id="input-bf-gal" accept="image/*" multiple>
-          <span class="fico">[ galeria ]</span>
-          <span>Desde galeria</span>
+          <span class="fico">[ galeria ]</span><span>Desde galeria</span>
         </div>
       </div>
-      <div class="progress-bar"><div class="progress-fill bf" id="prog-bf" style="width:0%"></div></div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-bf" style="width:0%"></div></div>
       <div class="foto-counter warn" id="cnt-bf">Sin fotos — minimo 1 requerida</div>
       <div class="fotos-grid" id="grid-bf"></div>
     </div>
 
+    <!-- Fotos anterior (condicional) -->
     <div class="card cond" id="sec-foto-ant">
-      <div class="card-title">Foto material campaña anterior <span style="font-size:.68rem;font-weight:400;text-transform:none;color:var(--gris-3)">(max 6)</span></div>
+      <div class="card-title">Foto material campaña anterior
+        <span style="font-size:.68rem;font-weight:400;text-transform:none;color:var(--gris-3)">(max 6)</span>
+      </div>
       <div class="foto-btns">
         <div class="foto-btn">
           <input type="file" id="input-ant-cam" accept="image/*" capture="environment" multiple>
-          <span class="fico">[ camara ]</span>
-          <span>Tomar foto</span>
+          <span class="fico">[ camara ]</span><span>Tomar foto</span>
         </div>
         <div class="foto-btn">
           <input type="file" id="input-ant-gal" accept="image/*" multiple>
-          <span class="fico">[ galeria ]</span>
-          <span>Desde galeria</span>
+          <span class="fico">[ galeria ]</span><span>Desde galeria</span>
         </div>
       </div>
-      <div class="progress-bar"><div class="progress-fill bf" id="prog-ant" style="width:0%"></div></div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-ant" style="width:0%"></div></div>
       <div class="foto-counter" id="cnt-ant">Sin fotos</div>
       <div class="fotos-grid" id="grid-ant"></div>
     </div>
+
   </div>
 
   <!-- PASO 4 -->
@@ -312,34 +343,62 @@ textarea:focus{outline:none;border-color:var(--azul);
       <div class="card-title">Competencia</div>
 
       <div class="field">
-        <label>Hay materiales de bancos o medios de pago de la competencia visibles en el local <span class="req">*</span></label>
-        <div class="opciones" id="op-materialComp"></div>
+        <label>Hay materiales de bancos o medios de pago de la competencia visibles <span class="req">*</span></label>
+        <div class="sino-group">
+          <div class="sino-btn" id="sino-comp-si" onclick="sinoComp('si')">Si</div>
+          <div class="sino-btn" id="sino-comp-no" onclick="sinoComp('no')">No</div>
+        </div>
+        <div class="cond" id="sec-comp-lista">
+          <div class="chk-lista" id="chk-materialComp"></div>
+        </div>
       </div>
 
       <div class="field">
         <label>El local tiene alguna otra promocion activa de otra entidad financiera <span class="req">*</span></label>
-        <div class="opciones" id="op-promoOtraEntidad"></div>
+        <div class="sino-group">
+          <div class="sino-btn" id="sino-promo-si" onclick="sinoPromo('si')">Si</div>
+          <div class="sino-btn" id="sino-promo-no" onclick="sinoPromo('no')">No</div>
+        </div>
+        <div class="cond" id="sec-promo-lista">
+          <div class="chk-lista" id="chk-promoOtraEntidad"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Fotos competencia (condicional) -->
+    <div class="card cond" id="sec-foto-comp">
+      <div class="card-title">Foto material competencia
+        <span style="font-size:.68rem;font-weight:400;text-transform:none;color:var(--gris-3)">(max 6)</span>
+      </div>
+
+      <button class="no-foto-btn" id="btn-no-foto-comp" onclick="toggleNoFotoComp()">
+        No se pueden tomar fotos
+      </button>
+      <div class="no-foto-obs" id="sec-no-foto-obs">
+        <label style="font-size:.82rem;font-weight:600;color:#856404;display:block;margin-bottom:6px">
+          Motivo por el que no se pueden tomar fotos <span class="req">*</span>
+        </label>
+        <textarea id="obs-no-foto" placeholder="Explicar por que no fue posible tomar fotos..."></textarea>
+      </div>
+
+      <div id="sec-foto-comp-inputs">
+        <div class="foto-btns">
+          <div class="foto-btn">
+            <input type="file" id="input-comp-cam" accept="image/*" capture="environment" multiple>
+            <span class="fico">[ camara ]</span><span>Tomar foto</span>
+          </div>
+          <div class="foto-btn">
+            <input type="file" id="input-comp-gal" accept="image/*" multiple>
+            <span class="fico">[ galeria ]</span><span>Desde galeria</span>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-comp" style="width:0%"></div></div>
+        <div class="foto-counter" id="cnt-comp">Sin fotos</div>
+        <div class="fotos-grid" id="grid-comp"></div>
       </div>
     </div>
 
-    <div class="card cond" id="sec-foto-comp">
-      <div class="card-title">Foto material competencia <span style="font-size:.68rem;font-weight:400;text-transform:none;color:var(--gris-3)">(max 6)</span></div>
-      <div class="foto-btns">
-        <div class="foto-btn">
-          <input type="file" id="input-comp-cam" accept="image/*" capture="environment" multiple>
-          <span class="fico">[ camara ]</span>
-          <span>Tomar foto</span>
-        </div>
-        <div class="foto-btn">
-          <input type="file" id="input-comp-gal" accept="image/*" multiple>
-          <span class="fico">[ galeria ]</span>
-          <span>Desde galeria</span>
-        </div>
-      </div>
-      <div class="progress-bar"><div class="progress-fill bf" id="prog-comp" style="width:0%"></div></div>
-      <div class="foto-counter" id="cnt-comp">Sin fotos</div>
-      <div class="fotos-grid" id="grid-comp"></div>
-    </div>
   </div>
 
   <!-- PASO 5 -->
@@ -366,13 +425,19 @@ textarea:focus{outline:none;border-color:var(--azul);
 
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbzo1sF6BMsTAIYkzgIStjRSx_dcZLKGm9ReIW06SV11drIlCH0q4s1k-IWdWUaOYV2Ipw/exec';
+const STORAGE_KEY = 'bf_fiscalizacion_draft';
+const TOTAL = 5;
 
 const S = {
   paso: 0,
+  pasoMax: 0,
   locales: [],
   localSel: null,
   fotos: { bf: [], ant: [], comp: [] },
   resp: {},
+  compSi: null,
+  promoSi: null,
+  noFotoComp: false,
   enviando: false,
 };
 
@@ -401,17 +466,134 @@ function init(d) {
   poblarOpciones('op-muestraPromo',       d.muestraPromo,       'muestraPromo');
   poblarOpciones('op-beneficioIndicado',  d.beneficioIndicado,  'beneficioIndicado');
   poblarOpciones('op-materialAnterior',   d.materialAnterior,   'materialAnterior');
-  poblarOpciones('op-materialComp',       d.materialComp,       'materialComp');
-  poblarOpciones('op-promoOtraEntidad',   d.promoOtraEntidad,   'promoOtraEntidad');
-  poblarOpciones('op-encargadoConoce',    d.encargadoConoce,    'encargadoConoce');
+  poblarChk('chk-materialComp',     d.materialComp,     'materialComp');
+  poblarChk('chk-promoOtraEntidad', d.promoOtraEntidad, 'promoOtraEntidad');
+  poblarOpciones('op-encargadoConoce', d.encargadoConoce, 'encargadoConoce');
 
   initBuscador();
   initFotos();
-  document.getElementById('sel-auditor').addEventListener('change', actualizarNav);
+  document.getElementById('sel-auditor').addEventListener('change', () => {
+    guardarBorrador();
+    actualizarNav();
+  });
+  document.getElementById('obs-no-foto').addEventListener('input', actualizarNav);
+
+  cargarBorrador();
   actualizarNav();
 }
 
-// ── POBLAR SELECT ─────────────────────────────────────────────
+// ── LOCALSTORAGE ──────────────────────────────────────────────
+function guardarBorrador() {
+  const data = {
+    paso:      S.paso,
+    pasoMax:   S.pasoMax,
+    localSel:  S.localSel,
+    resp:      S.resp,
+    compSi:    S.compSi,
+    promoSi:   S.promoSi,
+    noFotoComp: S.noFotoComp,
+    auditor:   document.getElementById('sel-auditor').value,
+    obsNoFoto: document.getElementById('obs-no-foto').value,
+    observaciones: document.getElementById('observaciones').value,
+    // Fotos se guardan solo como nombre (no base64 — muy pesado)
+    fotosNombres: {
+      bf:   S.fotos.bf.map(f => f.nombre),
+      ant:  S.fotos.ant.map(f => f.nombre),
+      comp: S.fotos.comp.map(f => f.nombre),
+    },
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function cargarBorrador() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+
+    // Restaurar respuestas
+    S.resp     = data.resp     || {};
+    S.localSel = data.localSel || null;
+    S.compSi   = data.compSi;
+    S.promoSi  = data.promoSi;
+    S.noFotoComp = data.noFotoComp || false;
+    S.pasoMax  = data.pasoMax || 0;
+
+    // Auditor
+    if (data.auditor) {
+      const sel = document.getElementById('sel-auditor');
+      sel.value = data.auditor;
+    }
+
+    // Observaciones
+    if (data.observaciones)
+      document.getElementById('observaciones').value = data.observaciones;
+    if (data.obsNoFoto)
+      document.getElementById('obs-no-foto').value = data.obsNoFoto;
+
+    // Local badge
+    if (S.localSel) {
+      document.getElementById('badge-txt').textContent = S.localSel;
+      document.getElementById('local-badge').classList.add('show');
+    }
+
+    // Restaurar opciones radio seleccionadas
+    Object.entries(S.resp).forEach(([campo, val]) => {
+      const el = document.querySelector('.opcion[data-campo="' + campo + '"][data-val="' + val + '"]');
+      if (el) el.classList.add('sel');
+    });
+
+    // Restaurar checkboxes competencia
+    if (S.compSi === 'si') {
+      document.getElementById('sino-comp-si').classList.add('si');
+      document.getElementById('sec-comp-lista').classList.add('on');
+      (S.resp.materialComp || []).forEach(v => {
+        const el = document.querySelector('.chk-item[data-campo="materialComp"][data-val="' + v + '"]');
+        if (el) el.classList.add('sel');
+      });
+    } else if (S.compSi === 'no') {
+      document.getElementById('sino-comp-no').classList.add('no');
+    }
+
+    if (S.promoSi === 'si') {
+      document.getElementById('sino-promo-si').classList.add('si');
+      document.getElementById('sec-promo-lista').classList.add('on');
+      (S.resp.promoOtraEntidad || []).forEach(v => {
+        const el = document.querySelector('.chk-item[data-campo="promoOtraEntidad"][data-val="' + v + '"]');
+        if (el) el.classList.add('sel');
+      });
+    } else if (S.promoSi === 'no') {
+      document.getElementById('sino-promo-no').classList.add('no');
+    }
+
+    // Condicionales
+    aplicarCondicionales();
+
+    // No foto comp
+    if (S.noFotoComp) {
+      document.getElementById('btn-no-foto-comp').classList.add('sel');
+      document.getElementById('sec-no-foto-obs').classList.add('on');
+      document.getElementById('sec-foto-comp-inputs').style.display = 'none';
+    }
+
+    // Mostrar banner si hay datos
+    const tieneDatos = S.localSel || document.getElementById('sel-auditor').value;
+    if (tieneDatos)
+      document.getElementById('draft-banner').style.display = 'flex';
+
+    // Restaurar paso
+    irA(Math.min(data.paso || 0, S.pasoMax));
+
+  } catch(e) {}
+}
+
+function limpiarBorrador() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  document.getElementById('draft-banner').style.display = 'none';
+  resetForm();
+}
+
+// ── POBLAR ────────────────────────────────────────────────────
 function poblarSelect(id, lista, ph) {
   const s = document.getElementById(id);
   s.innerHTML = '<option value="" disabled selected>' + ph + '</option>';
@@ -422,9 +604,9 @@ function poblarSelect(id, lista, ph) {
   });
 }
 
-// ── POBLAR OPCIONES RADIO ─────────────────────────────────────
 function poblarOpciones(containerId, lista, campo) {
   const wrap = document.getElementById(containerId);
+  if (!wrap) return;
   wrap.innerHTML = '';
   (lista||[]).forEach(val => {
     const div = document.createElement('div');
@@ -437,27 +619,101 @@ function poblarOpciones(containerId, lista, campo) {
   });
 }
 
+function poblarChk(containerId, lista, campo) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  (lista||[]).forEach(val => {
+    const div = document.createElement('div');
+    div.className = 'chk-item';
+    div.dataset.campo = campo;
+    div.dataset.val   = val;
+    div.innerHTML = '<div class="chk-box"></div>' + val;
+    div.addEventListener('click', () => toggleChk(div, campo, val));
+    wrap.appendChild(div);
+  });
+}
+
+// ── SELECCIÓN RADIO ───────────────────────────────────────────
 function elegirOpcion(el, campo, val) {
   document.querySelectorAll('.opcion[data-campo="' + campo + '"]')
     .forEach(o => o.classList.remove('sel'));
   el.classList.add('sel');
   S.resp[campo] = val;
-
-  // Condicionales fotos
-  if (campo === 'materialAnterior') {
-    const mostrar = val.startsWith('Sí');
-    document.getElementById('sec-foto-ant').classList.toggle('on', mostrar);
-  }
-  if (campo === 'materialComp' || campo === 'promoOtraEntidad') {
-    const compSel = S.resp['materialComp']    || '';
-    const promoSel = S.resp['promoOtraEntidad'] || '';
-    const mostrar = compSel.startsWith('Sí') || promoSel.startsWith('Sí');
-    document.getElementById('sec-foto-comp').classList.toggle('on', mostrar);
-  }
+  aplicarCondicionales();
+  guardarBorrador();
   actualizarNav();
 }
 
-// ── BUSCADOR LOCAL ────────────────────────────────────────────
+function aplicarCondicionales() {
+  // Material encontrado — si es Ninguno, ocultar detalle
+  const matEnc = S.resp.materialEncontrado || '';
+  const esNinguno = matEnc === 'Ninguno';
+  document.getElementById('sec-material-detalle').classList.toggle('on', !esNinguno && !!matEnc);
+
+  // Fotos campaña anterior
+  const antVal = S.resp.materialAnterior || '';
+  document.getElementById('sec-foto-ant').classList.toggle('on', antVal.startsWith('Sí') || antVal.startsWith('Si'));
+
+  // Fotos competencia
+  const mostrarFotoComp = S.compSi === 'si' || S.promoSi === 'si';
+  document.getElementById('sec-foto-comp').classList.toggle('on', mostrarFotoComp);
+}
+
+// ── CHECKBOXES ────────────────────────────────────────────────
+function toggleChk(el, campo, val) {
+  el.classList.toggle('sel');
+  if (!Array.isArray(S.resp[campo])) S.resp[campo] = [];
+  if (el.classList.contains('sel')) {
+    if (!S.resp[campo].includes(val)) S.resp[campo].push(val);
+  } else {
+    S.resp[campo] = S.resp[campo].filter(v => v !== val);
+  }
+  guardarBorrador();
+  actualizarNav();
+}
+
+// ── SI/NO COMPETENCIA ─────────────────────────────────────────
+function sinoComp(val) {
+  S.compSi = val;
+  document.getElementById('sino-comp-si').className = 'sino-btn' + (val === 'si' ? ' si' : '');
+  document.getElementById('sino-comp-no').className = 'sino-btn' + (val === 'no' ? ' no' : '');
+  document.getElementById('sec-comp-lista').classList.toggle('on', val === 'si');
+  if (val === 'no') {
+    S.resp.materialComp = [];
+    document.querySelectorAll('.chk-item[data-campo="materialComp"]').forEach(el => el.classList.remove('sel'));
+  }
+  aplicarCondicionales();
+  guardarBorrador();
+  actualizarNav();
+}
+
+function sinoPromo(val) {
+  S.promoSi = val;
+  document.getElementById('sino-promo-si').className = 'sino-btn' + (val === 'si' ? ' si' : '');
+  document.getElementById('sino-promo-no').className = 'sino-btn' + (val === 'no' ? ' no' : '');
+  document.getElementById('sec-promo-lista').classList.toggle('on', val === 'si');
+  if (val === 'no') {
+    S.resp.promoOtraEntidad = [];
+    document.querySelectorAll('.chk-item[data-campo="promoOtraEntidad"]').forEach(el => el.classList.remove('sel'));
+  }
+  aplicarCondicionales();
+  guardarBorrador();
+  actualizarNav();
+}
+
+// ── NO FOTO COMP ──────────────────────────────────────────────
+function toggleNoFotoComp() {
+  S.noFotoComp = !S.noFotoComp;
+  document.getElementById('btn-no-foto-comp').classList.toggle('sel', S.noFotoComp);
+  document.getElementById('sec-no-foto-obs').classList.toggle('on', S.noFotoComp);
+  document.getElementById('sec-foto-comp-inputs').style.display = S.noFotoComp ? 'none' : 'block';
+  if (!S.noFotoComp) document.getElementById('obs-no-foto').value = '';
+  guardarBorrador();
+  actualizarNav();
+}
+
+// ── BUSCADOR ──────────────────────────────────────────────────
 function initBuscador() {
   const inp   = document.getElementById('buscar-local');
   const drop  = document.getElementById('dropdown-locales');
@@ -494,6 +750,7 @@ function initBuscador() {
     S.localSel = null;
     badge.classList.remove('show');
     inp.value = '';
+    guardarBorrador();
     actualizarNav();
   });
 
@@ -503,6 +760,7 @@ function initBuscador() {
     drop.classList.remove('open');
     document.getElementById('badge-txt').textContent = local;
     badge.classList.add('show');
+    guardarBorrador();
     actualizarNav();
   }
 }
@@ -518,7 +776,9 @@ function initFotos() {
 }
 
 function bind(inputId, tipo) {
-  document.getElementById(inputId).addEventListener('change', e => {
+  const el = document.getElementById(inputId);
+  if (!el) return;
+  el.addEventListener('change', e => {
     procArchivos(e.target.files, tipo);
     e.target.value = '';
   });
@@ -554,6 +814,7 @@ function procFoto(file, tipo) {
       const nombre = tipo.toUpperCase() + '_' + local + '_' + aud + '_' + fecha + '_' + String(S.fotos[tipo].length+1).padStart(2,'0') + '.jpg';
       S.fotos[tipo].push({ dataUrl, nombre });
       renderFotos(tipo);
+      guardarBorrador();
       actualizarNav();
     };
     img.src = e.target.result;
@@ -562,11 +823,11 @@ function procFoto(file, tipo) {
 }
 
 function renderFotos(tipo) {
-  const grid = document.getElementById('grid-' + tipo);
-  const cnt  = document.getElementById('cnt-'  + tipo);
-  const prog = document.getElementById('prog-' + tipo);
-  const n    = S.fotos[tipo].length;
-
+  const grid = document.getElementById('grid-'  + tipo);
+  const cnt  = document.getElementById('cnt-'   + tipo);
+  const prog = document.getElementById('prog-'  + tipo);
+  if (!grid) return;
+  const n = S.fotos[tipo].length;
   grid.innerHTML = '';
   S.fotos[tipo].forEach((f, i) => {
     const d = document.createElement('div');
@@ -576,9 +837,7 @@ function renderFotos(tipo) {
       + '<button class="del" onclick="delFoto(\'' + tipo + '\',' + i + ')">x</button>';
     grid.appendChild(d);
   });
-
-  prog.style.width = Math.round(n/6*100) + '%';
-
+  if (prog) prog.style.width = Math.round(n/6*100) + '%';
   if (tipo === 'bf') {
     cnt.className = 'foto-counter ' + (n >= 1 ? 'ok' : 'warn');
     cnt.textContent = n === 0 ? 'Sin fotos — minimo 1 requerida' : n + ' de 6 foto(s)';
@@ -591,29 +850,41 @@ function renderFotos(tipo) {
 function delFoto(tipo, i) {
   S.fotos[tipo].splice(i, 1);
   renderFotos(tipo);
+  guardarBorrador();
   actualizarNav();
 }
 
-// ── NAVEGACIÓN ────────────────────────────────────────────────
-const TOTAL = 5;
-
+// ── VALIDACIÓN POR PASO ───────────────────────────────────────
 function pasoValido(n) {
   if (n === 0) return !!document.getElementById('sel-auditor').value;
   if (n === 1) return !!S.localSel;
-  if (n === 2) return !!(
-    S.resp.materialEncontrado &&
-    S.resp.otroMaterialBF &&
-    S.resp.estadoMaterial &&
-    S.resp.muestraPromo &&
-    S.resp.beneficioIndicado &&
-    S.resp.materialAnterior &&
-    S.fotos.bf.length >= 1
-  );
-  if (n === 3) return !!(S.resp.materialComp && S.resp.promoOtraEntidad);
+  if (n === 2) {
+    const mat = S.resp.materialEncontrado;
+    if (!mat) return false;
+    if (mat !== 'Ninguno') {
+      if (!S.resp.otroMaterialBF)    return false;
+      if (!S.resp.estadoMaterial)    return false;
+      if (!S.resp.muestraPromo)      return false;
+      if (!S.resp.beneficioIndicado) return false;
+    }
+    if (!S.resp.materialAnterior) return false;
+    if (S.fotos.bf.length < 1)    return false;
+    return true;
+  }
+  if (n === 3) {
+    if (S.compSi === null || S.promoSi === null) return false;
+    if (S.compSi === 'si' && (!S.resp.materialComp || S.resp.materialComp.length === 0)) return false;
+    if (S.promoSi === 'si' && (!S.resp.promoOtraEntidad || S.resp.promoOtraEntidad.length === 0)) return false;
+    if ((S.compSi === 'si' || S.promoSi === 'si') && S.noFotoComp) {
+      if (!document.getElementById('obs-no-foto').value.trim()) return false;
+    }
+    return true;
+  }
   if (n === 4) return !!S.resp.encargadoConoce;
   return true;
 }
 
+// ── NAVEGACIÓN ────────────────────────────────────────────────
 function actualizarNav() {
   const prev = document.getElementById('btn-prev');
   const next = document.getElementById('btn-next');
@@ -622,10 +893,18 @@ function actualizarNav() {
   next.textContent = esUltimo ? 'Enviar' : 'Siguiente';
   next.disabled = !pasoValido(S.paso);
 
-  // Marcar tabs
   for (let i = 0; i < TOTAL; i++) {
     const tab = document.getElementById('tab-' + i);
-    tab.className = 'step-btn' + (i === S.paso ? ' active' : i < S.paso ? ' done' : '');
+    if (i === S.paso)        tab.className = 'step-btn active';
+    else if (i <= S.pasoMax) tab.className = 'step-btn done';
+    else                     tab.className = 'step-btn locked';
+  }
+
+  // Tabs navegables hasta pasoMax
+  for (let i = 0; i < TOTAL; i++) {
+    const tab = document.getElementById('tab-' + i);
+    const idx = i;
+    tab.onclick = (i <= S.pasoMax && i !== S.paso) ? () => irA(idx) : null;
   }
 }
 
@@ -642,8 +921,10 @@ function navPrev() {
 function irA(n) {
   document.getElementById('paso-' + S.paso).classList.remove('active');
   S.paso = n;
+  if (n > S.pasoMax) S.pasoMax = n;
   document.getElementById('paso-' + S.paso).classList.add('active');
   window.scrollTo(0, 0);
+  guardarBorrador();
   actualizarNav();
 }
 
@@ -653,25 +934,29 @@ function enviar() {
   S.enviando = true;
   const btn = document.getElementById('btn-next');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner" style="display:inline-block"></span> Enviando...';
+  btn.textContent = 'Enviando...';
   overlay('Subiendo fotos y guardando registro...', 'Esto puede tomar unos segundos');
 
+  const compVal  = S.compSi  === 'no' ? 'No' : (S.resp.materialComp     || []).join(', ');
+  const promoVal = S.promoSi === 'no' ? 'No' : (S.resp.promoOtraEntidad || []).join(', ');
+
   const payload = {
-    auditor:             document.getElementById('sel-auditor').value,
-    local:               S.localSel,
-    materialEncontrado:  S.resp.materialEncontrado  || '',
-    otroMaterialBF:      S.resp.otroMaterialBF      || '',
-    estadoMaterial:      S.resp.estadoMaterial      || '',
-    muestraPromo:        S.resp.muestraPromo        || '',
-    beneficioIndicado:   S.resp.beneficioIndicado   || '',
-    materialAnterior:    S.resp.materialAnterior    || '',
-    materialComp:        S.resp.materialComp        || '',
-    promoOtraEntidad:    S.resp.promoOtraEntidad    || '',
-    encargadoConoce:     S.resp.encargadoConoce     || '',
-    observaciones:       document.getElementById('observaciones').value.trim(),
+    auditor:            document.getElementById('sel-auditor').value,
+    local:              S.localSel,
+    materialEncontrado: S.resp.materialEncontrado  || '',
+    otroMaterialBF:     S.resp.otroMaterialBF      || 'No aplica',
+    estadoMaterial:     S.resp.estadoMaterial      || 'No aplica',
+    muestraPromo:       S.resp.muestraPromo        || 'No aplica',
+    beneficioIndicado:  S.resp.beneficioIndicado   || 'No aplica',
+    materialAnterior:   S.resp.materialAnterior    || '',
+    materialComp:       compVal,
+    promoOtraEntidad:   promoVal,
+    encargadoConoce:    S.resp.encargadoConoce     || '',
+    observaciones:      document.getElementById('observaciones').value.trim(),
+    obsNoFotoComp:      S.noFotoComp ? document.getElementById('obs-no-foto').value.trim() : '',
     fotosBF:   S.fotos.bf.map(f   => ({ base64: f.dataUrl, nombre: f.nombre })),
     fotosAnt:  S.fotos.ant.map(f  => ({ base64: f.dataUrl, nombre: f.nombre })),
-    fotosComp: S.fotos.comp.map(f => ({ base64: f.dataUrl, nombre: f.nombre })),
+    fotosComp: S.noFotoComp ? [] : S.fotos.comp.map(f => ({ base64: f.dataUrl, nombre: f.nombre })),
   };
 
   fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -679,8 +964,9 @@ function enviar() {
     .then(res => {
       hideOverlay(); S.enviando = false;
       if (res.ok) {
+        try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
         toast('Registro guardado correctamente', 'ok');
-        resetForm();
+        setTimeout(resetForm, 1500);
       } else {
         toast('Error: ' + res.error, 'err');
         btn.disabled = false;
@@ -695,25 +981,36 @@ function enviar() {
     });
 }
 
+// ── RESET ─────────────────────────────────────────────────────
 function resetForm() {
-  S.paso = 0; S.localSel = null; S.resp = {};
-  S.fotos = { bf: [], ant: [], comp: [] };
+  S.paso = 0; S.pasoMax = 0; S.localSel = null;
+  S.resp = {}; S.compSi = null; S.promoSi = null;
+  S.noFotoComp = false; S.fotos = { bf: [], ant: [], comp: [] };
   S.enviando = false;
   document.getElementById('sel-auditor').value = '';
   document.getElementById('buscar-local').value = '';
   document.getElementById('observaciones').value = '';
+  document.getElementById('obs-no-foto').value = '';
   document.getElementById('local-badge').classList.remove('show');
+  document.getElementById('draft-banner').style.display = 'none';
   document.querySelectorAll('.opcion').forEach(o => o.classList.remove('sel'));
+  document.querySelectorAll('.chk-item').forEach(o => o.classList.remove('sel'));
+  document.querySelectorAll('.sino-btn').forEach(o => o.className = 'sino-btn');
+  document.getElementById('sec-comp-lista').classList.remove('on');
+  document.getElementById('sec-promo-lista').classList.remove('on');
+  document.getElementById('sec-material-detalle').classList.remove('on');
   document.getElementById('sec-foto-ant').classList.remove('on');
   document.getElementById('sec-foto-comp').classList.remove('on');
+  document.getElementById('btn-no-foto-comp').classList.remove('sel');
+  document.getElementById('sec-no-foto-obs').classList.remove('on');
+  document.getElementById('sec-foto-comp-inputs').style.display = 'block';
   ['bf','ant','comp'].forEach(t => renderFotos(t));
-  for (let i = 0; i < TOTAL; i++) {
+  for (let i = 0; i < TOTAL; i++)
     document.getElementById('paso-' + i).classList.toggle('active', i === 0);
-  }
   actualizarNav();
 }
 
-// ── UI HELPERS ────────────────────────────────────────────────
+// ── UI ────────────────────────────────────────────────────────
 function overlay(msg, sub) {
   document.getElementById('overlay-msg').textContent = msg || 'Procesando...';
   document.getElementById('overlay-sub').textContent = sub || '';
